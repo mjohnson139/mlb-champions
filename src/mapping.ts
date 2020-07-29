@@ -1,4 +1,4 @@
-import { BigInt } from "@graphprotocol/graph-ts"
+import { BigInt } from "@graphprotocol/graph-ts";
 import {
   Contract,
   ContractUpgrade,
@@ -6,32 +6,33 @@ import {
   Created,
   Transfer,
   Approval,
-  ApprovalForAll
-} from "../generated/Contract/Contract"
-import { ExampleEntity } from "../generated/schema"
+  ApprovalForAll,
+  ConstructorCall,
+} from "../generated/Contract/Contract";
+import { ExampleEntity, CollectableEntity } from "../generated/schema";
 
 export function handleContractUpgrade(event: ContractUpgrade): void {
   // Entities can be loaded from the store using a string ID; this ID
   // needs to be unique across all entities of the same type
-  let entity = ExampleEntity.load(event.transaction.from.toHex())
+  let entity = ExampleEntity.load(event.transaction.from.toHex());
 
   // Entities only exist after they have been saved to the store;
   // `null` checks allow to create entities on demand
   if (entity == null) {
-    entity = new ExampleEntity(event.transaction.from.toHex())
+    entity = new ExampleEntity(event.transaction.from.toHex());
 
     // Entity fields can be set using simple assignments
-    entity.count = BigInt.fromI32(0)
+    entity.count = BigInt.fromI32(0);
   }
 
   // BigInt and BigDecimal math are supported
-  entity.count = entity.count + BigInt.fromI32(1)
+  entity.count = entity.count + BigInt.fromI32(1);
 
   // Entity fields can be set based on event parameters
-  entity.newContract = event.params.newContract
+  entity.newContract = event.params.newContract;
 
   // Entities can be written to the store with `.save()`
-  entity.save()
+  entity.save();
 
   // Note: If a handler doesn't require existing field values, it is faster
   // _not_ to load the entity from the store. Instead, create it fresh with
@@ -102,7 +103,27 @@ export function handleContractUpgrade(event: ContractUpgrade): void {
 
 export function handleAssetUpdated(event: AssetUpdated): void {}
 
-export function handleCreated(event: Created): void {}
+export function handleCreated(event: Created): void {
+  let contract = Contract.bind(event.address);
+  let collectableDetails = contract.getCollectibleDetails(event.params.tokenId);
+
+  let entity = new CollectableEntity(event.params.tokenId.toHex());
+  entity.tokenId = event.params.tokenId;
+  entity.isAttached = collectableDetails.value0;
+  entity.sequenceId = collectableDetails.value1;
+  entity.teamId = collectableDetails.value2;
+  entity.positionId = collectableDetails.value3;
+  entity.creationTime = collectableDetails.value4;
+  entity.attributes = collectableDetails.value5;
+  entity.playerOverrideId = collectableDetails.value6;
+  entity.mlbGameId = collectableDetails.value7;
+  entity.currentGameCardId = collectableDetails.value8;
+  entity.mlbPlayerId = collectableDetails.value9;
+  entity.earnedBy = collectableDetails.value10;
+  entity.generationSeason = collectableDetails.value11;
+
+  entity.save();
+}
 
 export function handleTransfer(event: Transfer): void {}
 

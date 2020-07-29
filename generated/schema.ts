@@ -60,3 +60,289 @@ export class ExampleEntity extends Entity {
     this.set("newContract", Value.fromBytes(value));
   }
 }
+
+export class TransferEntity extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id !== null, "Cannot save TransferEntity entity without an ID");
+    assert(
+      id.kind == ValueKind.STRING,
+      "Cannot save TransferEntity entity with non-string ID. " +
+        'Considering using .toHex() to convert the "id" to a string.'
+    );
+    store.set("TransferEntity", id.toString(), this);
+  }
+
+  static load(id: string): TransferEntity | null {
+    return store.get("TransferEntity", id) as TransferEntity | null;
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get _from(): Bytes {
+    let value = this.get("_from");
+    return value.toBytes();
+  }
+
+  set _from(value: Bytes) {
+    this.set("_from", Value.fromBytes(value));
+  }
+
+  get _to(): Bytes {
+    let value = this.get("_to");
+    return value.toBytes();
+  }
+
+  set _to(value: Bytes) {
+    this.set("_to", Value.fromBytes(value));
+  }
+
+  get _value(): BigInt {
+    let value = this.get("_value");
+    return value.toBigInt();
+  }
+
+  set _value(value: BigInt) {
+    this.set("_value", Value.fromBigInt(value));
+  }
+}
+
+export class CollectableEntity extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id !== null, "Cannot save CollectableEntity entity without an ID");
+    assert(
+      id.kind == ValueKind.STRING,
+      "Cannot save CollectableEntity entity with non-string ID. " +
+        'Considering using .toHex() to convert the "id" to a string.'
+    );
+    store.set("CollectableEntity", id.toString(), this);
+  }
+
+  static load(id: string): CollectableEntity | null {
+    return store.get("CollectableEntity", id) as CollectableEntity | null;
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get tokenId(): BigInt {
+    let value = this.get("tokenId");
+    return value.toBigInt();
+  }
+
+  set tokenId(value: BigInt) {
+    this.set("tokenId", Value.fromBigInt(value));
+  }
+
+  get isAttached(): BigInt | null {
+    let value = this.get("isAttached");
+    if (value === null) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set isAttached(value: BigInt | null) {
+    if (value === null) {
+      this.unset("isAttached");
+    } else {
+      this.set("isAttached", Value.fromBigInt(value as BigInt));
+    }
+  }
+
+  get sequenceId(): BigInt | null {
+    let value = this.get("sequenceId");
+    if (value === null) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set sequenceId(value: BigInt | null) {
+    if (value === null) {
+      this.unset("sequenceId");
+    } else {
+      this.set("sequenceId", Value.fromBigInt(value as BigInt));
+    }
+  }
+
+  get teamId(): i32 {
+    let value = this.get("teamId");
+    return value.toI32();
+  }
+
+  set teamId(value: i32) {
+    this.set("teamId", Value.fromI32(value));
+  }
+
+  get positionId(): i32 {
+    let value = this.get("positionId");
+    return value.toI32();
+  }
+
+  set positionId(value: i32) {
+    this.set("positionId", Value.fromI32(value));
+  }
+
+  get creationTime(): BigInt | null {
+    let value = this.get("creationTime");
+    if (value === null) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set creationTime(value: BigInt | null) {
+    if (value === null) {
+      this.unset("creationTime");
+    } else {
+      this.set("creationTime", Value.fromBigInt(value as BigInt));
+    }
+  }
+
+  get attributes(): BigInt | null {
+    let value = this.get("attributes");
+    if (value === null) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set attributes(value: BigInt | null) {
+    if (value === null) {
+      this.unset("attributes");
+    } else {
+      this.set("attributes", Value.fromBigInt(value as BigInt));
+    }
+  }
+
+  get playerOverrideId(): BigInt | null {
+    let value = this.get("playerOverrideId");
+    if (value === null) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set playerOverrideId(value: BigInt | null) {
+    if (value === null) {
+      this.unset("playerOverrideId");
+    } else {
+      this.set("playerOverrideId", Value.fromBigInt(value as BigInt));
+    }
+  }
+
+  get mlbGameId(): BigInt | null {
+    let value = this.get("mlbGameId");
+    if (value === null) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set mlbGameId(value: BigInt | null) {
+    if (value === null) {
+      this.unset("mlbGameId");
+    } else {
+      this.set("mlbGameId", Value.fromBigInt(value as BigInt));
+    }
+  }
+
+  get currentGameCardId(): BigInt | null {
+    let value = this.get("currentGameCardId");
+    if (value === null) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set currentGameCardId(value: BigInt | null) {
+    if (value === null) {
+      this.unset("currentGameCardId");
+    } else {
+      this.set("currentGameCardId", Value.fromBigInt(value as BigInt));
+    }
+  }
+
+  get mlbPlayerId(): BigInt | null {
+    let value = this.get("mlbPlayerId");
+    if (value === null) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set mlbPlayerId(value: BigInt | null) {
+    if (value === null) {
+      this.unset("mlbPlayerId");
+    } else {
+      this.set("mlbPlayerId", Value.fromBigInt(value as BigInt));
+    }
+  }
+
+  get earnedBy(): BigInt | null {
+    let value = this.get("earnedBy");
+    if (value === null) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set earnedBy(value: BigInt | null) {
+    if (value === null) {
+      this.unset("earnedBy");
+    } else {
+      this.set("earnedBy", Value.fromBigInt(value as BigInt));
+    }
+  }
+
+  get generationSeason(): BigInt | null {
+    let value = this.get("generationSeason");
+    if (value === null) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set generationSeason(value: BigInt | null) {
+    if (value === null) {
+      this.unset("generationSeason");
+    } else {
+      this.set("generationSeason", Value.fromBigInt(value as BigInt));
+    }
+  }
+}

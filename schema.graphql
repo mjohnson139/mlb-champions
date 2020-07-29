@@ -3,3 +3,27 @@ type ExampleEntity @entity {
   count: BigInt!
   newContract: Bytes! # address
 }
+
+type TransferEntity @entity {
+  id: ID!
+  _from: Bytes!
+  _to: Bytes! # address
+  _value: BigInt! # uint256
+}
+
+type CollectableEntity @entity {
+  id: ID!
+  tokenId: BigInt!
+  isAttached: BigInt
+  sequenceId: BigInt
+  teamId: Int
+  positionId: Int
+  creationTime: BigInt
+  attributes: BigInt
+  playerOverrideId: BigInt
+  mlbGameId: BigInt
+  currentGameCardId: BigInt
+  mlbPlayerId: BigInt
+  earnedBy: BigInt
+  generationSeason: BigInt
+}
