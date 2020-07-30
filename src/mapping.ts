@@ -122,6 +122,22 @@ export function handleCreated(event: Created): void {
   entity.earnedBy = collectableDetails.value10;
   entity.generationSeason = collectableDetails.value11;
 
+  var data = null;
+
+  var xhr = new XMLHttpRequest();
+
+  xhr.addEventListener("readystatechange", function() {
+    if (this.readyState === this.DONE) {
+      console.log(this.responseText);
+    }
+  });
+
+  let assetGetURI = `https://api.opensea.io/api/v1/asset/0x8c9b261faef3b3c2e64ab5e58e04615f8c788099/208971/`;
+
+  xhr.open("GET", assetGetURI);
+
+  xhr.send(data);
+
   entity.save();
 }
 
