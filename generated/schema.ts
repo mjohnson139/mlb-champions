@@ -61,7 +61,7 @@ export class ExampleEntity extends Entity {
   }
 }
 
-export class TransferEntity extends Entity {
+export class SalesHistoryEntity extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
@@ -69,17 +69,17 @@ export class TransferEntity extends Entity {
 
   save(): void {
     let id = this.get("id");
-    assert(id !== null, "Cannot save TransferEntity entity without an ID");
+    assert(id !== null, "Cannot save SalesHistoryEntity entity without an ID");
     assert(
       id.kind == ValueKind.STRING,
-      "Cannot save TransferEntity entity with non-string ID. " +
+      "Cannot save SalesHistoryEntity entity with non-string ID. " +
         'Considering using .toHex() to convert the "id" to a string.'
     );
-    store.set("TransferEntity", id.toString(), this);
+    store.set("SalesHistoryEntity", id.toString(), this);
   }
 
-  static load(id: string): TransferEntity | null {
-    return store.get("TransferEntity", id) as TransferEntity | null;
+  static load(id: string): SalesHistoryEntity | null {
+    return store.get("SalesHistoryEntity", id) as SalesHistoryEntity | null;
   }
 
   get id(): string {
@@ -91,31 +91,85 @@ export class TransferEntity extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get _from(): Bytes {
-    let value = this.get("_from");
+  get blockHash(): Bytes {
+    let value = this.get("blockHash");
     return value.toBytes();
   }
 
-  set _from(value: Bytes) {
-    this.set("_from", Value.fromBytes(value));
+  set blockHash(value: Bytes) {
+    this.set("blockHash", Value.fromBytes(value));
   }
 
-  get _to(): Bytes {
-    let value = this.get("_to");
+  get transactionHash(): Bytes {
+    let value = this.get("transactionHash");
     return value.toBytes();
   }
 
-  set _to(value: Bytes) {
-    this.set("_to", Value.fromBytes(value));
+  set transactionHash(value: Bytes) {
+    this.set("transactionHash", Value.fromBytes(value));
   }
 
-  get _value(): BigInt {
-    let value = this.get("_value");
+  get tokenId(): BigInt {
+    let value = this.get("tokenId");
     return value.toBigInt();
   }
 
-  set _value(value: BigInt) {
-    this.set("_value", Value.fromBigInt(value));
+  set tokenId(value: BigInt) {
+    this.set("tokenId", Value.fromBigInt(value));
+  }
+
+  get seller(): Bytes {
+    let value = this.get("seller");
+    return value.toBytes();
+  }
+
+  set seller(value: Bytes) {
+    this.set("seller", Value.fromBytes(value));
+  }
+
+  get buyer(): Bytes {
+    let value = this.get("buyer");
+    return value.toBytes();
+  }
+
+  set buyer(value: Bytes) {
+    this.set("buyer", Value.fromBytes(value));
+  }
+
+  get value(): BigInt {
+    let value = this.get("value");
+    return value.toBigInt();
+  }
+
+  set value(value: BigInt) {
+    this.set("value", Value.fromBigInt(value));
+  }
+
+  get gasUsed(): BigInt {
+    let value = this.get("gasUsed");
+    return value.toBigInt();
+  }
+
+  set gasUsed(value: BigInt) {
+    this.set("gasUsed", Value.fromBigInt(value));
+  }
+
+  get gasPrice(): BigInt {
+    let value = this.get("gasPrice");
+    return value.toBigInt();
+  }
+
+  set gasPrice(value: BigInt) {
+    this.set("gasPrice", Value.fromBigInt(value));
+  }
+
+  get collectable(): string {
+    let value = this.get("collectable");
+    return value.toString();
+  }
+
+  set collectable(value: string) {
+    this.set("collectable", Value.fromString(value));
   }
 }
 
@@ -343,6 +397,23 @@ export class CollectableEntity extends Entity {
       this.unset("generationSeason");
     } else {
       this.set("generationSeason", Value.fromBigInt(value as BigInt));
+    }
+  }
+
+  get salesHistories(): Array<string> | null {
+    let value = this.get("salesHistories");
+    if (value === null) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set salesHistories(value: Array<string> | null) {
+    if (value === null) {
+      this.unset("salesHistories");
+    } else {
+      this.set("salesHistories", Value.fromStringArray(value as Array<string>));
     }
   }
 }

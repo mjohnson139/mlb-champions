@@ -4,12 +4,6 @@ type ExampleEntity @entity {
   newContract: Bytes! # address
 }
 
-# type TransferEntity @entity {
-#   id: ID!
-#   _from: Bytes!
-#   _to: Bytes! # address
-#   _value: BigInt! # uint256
-# }
 type SalesHistoryEntity @entity {
   id: ID!
   blockHash: Bytes!
@@ -20,6 +14,7 @@ type SalesHistoryEntity @entity {
   value: BigInt!
   gasUsed: BigInt!
   gasPrice: BigInt!
+  collectable: CollectableEntity!
 }
 
 type CollectableEntity @entity {
@@ -37,5 +32,5 @@ type CollectableEntity @entity {
   mlbPlayerId: BigInt
   earnedBy: BigInt
   generationSeason: BigInt
-  salesHistory: [SalesHistoryEntity!] @derivedFrom(field: "tokenId")
+  salesHistories: [SalesHistoryEntity!]
 }
