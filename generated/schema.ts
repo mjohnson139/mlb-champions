@@ -91,15 +91,6 @@ export class SalesHistoryEntity extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get blockHash(): Bytes {
-    let value = this.get("blockHash");
-    return value.toBytes();
-  }
-
-  set blockHash(value: Bytes) {
-    this.set("blockHash", Value.fromBytes(value));
-  }
-
   get transactionHash(): Bytes {
     let value = this.get("transactionHash");
     return value.toBytes();
@@ -118,22 +109,30 @@ export class SalesHistoryEntity extends Entity {
     this.set("tokenId", Value.fromBigInt(value));
   }
 
-  get seller(): Bytes {
-    let value = this.get("seller");
+  get sellerAddress(): Bytes {
+    let value = this.get("sellerAddress");
     return value.toBytes();
   }
 
-  set seller(value: Bytes) {
-    this.set("seller", Value.fromBytes(value));
+  set sellerAddress(value: Bytes) {
+    this.set("sellerAddress", Value.fromBytes(value));
   }
 
-  get buyer(): Bytes {
-    let value = this.get("buyer");
-    return value.toBytes();
+  get buyerAddress(): Bytes | null {
+    let value = this.get("buyerAddress");
+    if (value === null) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
   }
 
-  set buyer(value: Bytes) {
-    this.set("buyer", Value.fromBytes(value));
+  set buyerAddress(value: Bytes | null) {
+    if (value === null) {
+      this.unset("buyerAddress");
+    } else {
+      this.set("buyerAddress", Value.fromBytes(value as Bytes));
+    }
   }
 
   get value(): BigInt {

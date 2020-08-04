@@ -6,11 +6,10 @@ type ExampleEntity @entity {
 
 type SalesHistoryEntity @entity {
   id: ID!
-  blockHash: Bytes!
   transactionHash: Bytes!
   tokenId: BigInt!
-  seller: Bytes!
-  buyer: Bytes!
+  sellerAddress: Bytes!
+  buyerAddress: Bytes
   value: BigInt!
   gasUsed: BigInt!
   gasPrice: BigInt!
@@ -32,5 +31,5 @@ type CollectableEntity @entity {
   mlbPlayerId: BigInt
   earnedBy: BigInt
   generationSeason: BigInt
-  salesHistories: [SalesHistoryEntity!]
+  salesHistories: [SalesHistoryEntity!] @derivedFrom(field: "collectable")
 }
