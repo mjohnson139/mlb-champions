@@ -25,12 +25,13 @@ type CollectableEntity @entity {
   generationSeason: BigInt
   salesHistories: [SalesHistoryEntity!] @derivedFrom(field: "collectable")
   tokenURI: String
+  playerEntity: PlayerEntity!
 }
 
 type PlayerEntity @entity {
   id: ID!
   mlbPlayerId: BigInt!
-  collectables: [CollectableEntity!] @derivedFrom(field: playerEntity)
+  collectables: [CollectableEntity!] @derivedFrom(field: "playerEntity")
   totalCollectables: BigInt!
   totalVolumeInEth: BigDecimal!
 }
