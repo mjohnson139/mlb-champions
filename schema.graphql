@@ -29,9 +29,8 @@ type CollectableEntity @entity {
 }
 
 type PlayerEntity @entity {
-  id: ID!
-  mlbPlayerId: BigInt!
+  id: ID! #same as the mlbPlayerId
   collectables: [CollectableEntity!] @derivedFrom(field: "playerEntity")
   totalCollectables: BigInt!
-  totalVolumeInEth: BigDecimal!
+  totalVolume: BigInt!
 }

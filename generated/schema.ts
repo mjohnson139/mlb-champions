@@ -382,15 +382,6 @@ export class PlayerEntity extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get mlbPlayerId(): BigInt {
-    let value = this.get("mlbPlayerId");
-    return value.toBigInt();
-  }
-
-  set mlbPlayerId(value: BigInt) {
-    this.set("mlbPlayerId", Value.fromBigInt(value));
-  }
-
   get collectables(): Array<string> | null {
     let value = this.get("collectables");
     if (value === null) {
@@ -417,12 +408,12 @@ export class PlayerEntity extends Entity {
     this.set("totalCollectables", Value.fromBigInt(value));
   }
 
-  get totalVolumeInEth(): BigDecimal {
-    let value = this.get("totalVolumeInEth");
-    return value.toBigDecimal();
+  get totalVolume(): BigInt {
+    let value = this.get("totalVolume");
+    return value.toBigInt();
   }
 
-  set totalVolumeInEth(value: BigDecimal) {
-    this.set("totalVolumeInEth", Value.fromBigDecimal(value));
+  set totalVolume(value: BigInt) {
+    this.set("totalVolume", Value.fromBigInt(value));
   }
 }

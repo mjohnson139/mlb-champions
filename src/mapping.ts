@@ -9,7 +9,21 @@ import {
   ApprovalForAll,
   Contract__getCollectibleDetailsResult,
 } from "../generated/Contract/Contract";
-import { CollectableEntity, SalesHistoryEntity } from "../generated/schema";
+import {
+  CollectableEntity,
+  SalesHistoryEntity,
+  PlayerEntity,
+} from "../generated/schema";
+
+import {
+  bigDecimalExp18,
+  zeroBD,
+  zeroBigInt,
+  oneBigInt,
+  convertEthToDecimal,
+  convertTokenToDecimal,
+  equalToZero,
+} from "./helpers";
 
 // Ethereum support
 export function handleAssetUpdated(event: AssetUpdated): void {
@@ -24,12 +38,27 @@ export function handleAssetUpdated(event: AssetUpdated): void {
 
 export function handleCreated(event: Created): void {
   let tokenId = event.params.tokenId;
+  let transaction = event.transaction;
 
   let contract = Contract.bind(event.address);
   let collectableDetails = contract.getCollectibleDetails(tokenId);
   let tokenURI = contract.tokenURI(tokenId);
 
   let entity = createCollectableEntity(tokenId, tokenURI, collectableDetails);
+
+  //Create the Player associated with this collectable
+  let mlbPlayerId = entity.mlbPlayerId.toString();
+  let player = PlayerEntity.load(mlbPlayerId);
+
+  if (player === null) {
+    player = new PlayerEntity(mlbPlayerId);
+    player.totalCollectables = oneBigInt();
+    player.totalVolume = zeroBigInt().plus(transaction.value);
+  } else {
+    player.totalCollectables = player.totalCollectables.plus(oneBigInt());
+    player.totalVolume = player.totalVolume.plus(transaction.value);
+  }
+  player.save();
 
   entity.save();
 }
@@ -38,13 +67,14 @@ function createCollectableEntity(
   tokenId: BigInt,
   tokenURI: string,
   details: Contract__getCollectibleDetailsResult
-): CollectableEntity {
-  let entity = new CollectableEntity(tokenId.toHex());
+): CollectableEntity | null {
+  let entity = CollectableEntity.load(tokenId.toHex());
+
+  if (entity === null) {
+    entity = new CollectableEntity(tokenId.toHex());
+  }
 
   entity.tokenId = tokenId;
-  entity.isAttached = details.value0;
-  entity.sequenceId = details.value1;
-
   entity.teamId = details.value2;
   let teamName = convertTeamId(entity.teamId);
   entity.teamName = teamName;
@@ -55,9 +85,6 @@ function createCollectableEntity(
 
   entity.creationTime = details.value4;
   entity.attributes = details.value5;
-  entity.playerOverrideId = details.value6;
-  entity.mlbGameId = details.value7;
-  entity.currentGameCardId = details.value8;
   entity.mlbPlayerId = details.value9;
   entity.earnedBy = details.value10;
   entity.generationSeason = details.value11;
