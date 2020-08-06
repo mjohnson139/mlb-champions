@@ -13,17 +13,10 @@ import {
   CollectableEntity,
   SalesHistoryEntity,
   PlayerEntity,
+  TradeEntity,
 } from "../generated/schema";
 
-import {
-  bigDecimalExp18,
-  zeroBD,
-  zeroBigInt,
-  oneBigInt,
-  convertEthToDecimal,
-  convertTokenToDecimal,
-  equalToZero,
-} from "./helpers";
+import { zeroBigInt, oneBigInt } from "./helpers";
 
 // Ethereum support
 export function handleAssetUpdated(event: AssetUpdated): void {
@@ -136,8 +129,22 @@ export function handleTransfer(event: Transfer): void {
 
   //Create the Entity Relationship
   entity.collectable = event.params._tokenId.toHex();
-
   entity.save();
+
+  //Create a trade entry
+  let tradeEntity = TradeEntity.load(tokenId.toString());
+  if (tradeEntity === null) {
+    tradeEntity = new TradeEntity(tokenId.toString());
+    tradeEntity.totalTradesCounter = oneBigInt();
+    tradeEntity.collectable = tokenId.toHex();
+    tradeEntity.player = mlbPlayerId.toString();
+  } else {
+    tradeEntity.totalTradesCounter = tradeEntity.totalTradesCounter.plus(
+      oneBigInt()
+    );
+  }
+
+  tradeEntity.save();
 }
 
 export function handleApproval(event: Approval): void {}

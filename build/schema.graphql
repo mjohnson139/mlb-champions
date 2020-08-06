@@ -35,7 +35,7 @@ type PlayerEntity @entity {
   totalVolume: BigInt!
 }
 
-type TradesEntity @entity {
+type TradeEntity @entity {
   id: ID! #tokenId
   collectable: CollectableEntity!
   player: PlayerEntity!
