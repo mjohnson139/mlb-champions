@@ -72,7 +72,7 @@ function createPlayerEntity(mlbPlayerId: string): PlayerEntity | null {
   let player = PlayerEntity.load(mlbPlayerId);
   if (player === null) {
     player = new PlayerEntity(mlbPlayerId);
-    player.totalCollectables = oneBigInt();
+    player.totalCollectables = zeroBigInt();
     player.totalVolume = zeroBigInt();
   }
 

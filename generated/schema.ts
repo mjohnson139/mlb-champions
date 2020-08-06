@@ -417,3 +417,61 @@ export class PlayerEntity extends Entity {
     this.set("totalVolume", Value.fromBigInt(value));
   }
 }
+
+export class TradeEntity extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id !== null, "Cannot save TradeEntity entity without an ID");
+    assert(
+      id.kind == ValueKind.STRING,
+      "Cannot save TradeEntity entity with non-string ID. " +
+        'Considering using .toHex() to convert the "id" to a string.'
+    );
+    store.set("TradeEntity", id.toString(), this);
+  }
+
+  static load(id: string): TradeEntity | null {
+    return store.get("TradeEntity", id) as TradeEntity | null;
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get collectable(): string {
+    let value = this.get("collectable");
+    return value.toString();
+  }
+
+  set collectable(value: string) {
+    this.set("collectable", Value.fromString(value));
+  }
+
+  get player(): string {
+    let value = this.get("player");
+    return value.toString();
+  }
+
+  set player(value: string) {
+    this.set("player", Value.fromString(value));
+  }
+
+  get totalTradesCounter(): BigInt {
+    let value = this.get("totalTradesCounter");
+    return value.toBigInt();
+  }
+
+  set totalTradesCounter(value: BigInt) {
+    this.set("totalTradesCounter", Value.fromBigInt(value));
+  }
+}
