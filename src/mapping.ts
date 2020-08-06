@@ -59,6 +59,7 @@ export function handleCreated(event: Created): void {
     player.totalVolume = player.totalVolume.plus(transaction.value);
   }
   player.save();
+  entity.playerEntity = mlbPlayerId;
 
   entity.save();
 }
