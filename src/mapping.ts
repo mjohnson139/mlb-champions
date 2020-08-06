@@ -120,6 +120,10 @@ export function handleTransfer(event: Transfer): void {
   entity.gasPrice = transaction.gasPrice;
   entity.timeStamp = event.block.timestamp;
 
+  //Create the Entity Relationship
+  entity.collectable = tokenId.toString();
+  entity.save();
+
   //Create the Player associated with this collectable
   let mlbPlayerId = collectableDetails.value9;
   let player = createPlayerEntity(mlbPlayerId.toString());
@@ -127,22 +131,17 @@ export function handleTransfer(event: Transfer): void {
 
   player.save();
 
-  //Create the Entity Relationship
-  entity.collectable = event.params._tokenId.toHex();
-  entity.save();
-
   //Create a trade entry
   let tradeEntity = TradeEntity.load(tokenId.toString());
   if (tradeEntity === null) {
     tradeEntity = new TradeEntity(tokenId.toString());
-    tradeEntity.totalTradesCounter = oneBigInt();
+    tradeEntity.totalTradesCounter = zeroBigInt();
     tradeEntity.collectable = tokenId.toHex();
     tradeEntity.player = mlbPlayerId.toString();
-  } else {
-    tradeEntity.totalTradesCounter = tradeEntity.totalTradesCounter.plus(
-      oneBigInt()
-    );
   }
+  tradeEntity.totalTradesCounter = tradeEntity.totalTradesCounter.plus(
+    oneBigInt()
+  );
 
   tradeEntity.save();
 }
