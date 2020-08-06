@@ -9,21 +9,39 @@ import {
   ApprovalForAll,
   Contract__getCollectibleDetailsResult,
 } from "../generated/Contract/Contract";
-import { CollectableEntity, SalesHistoryEntity } from "../generated/schema";
+import {
+  CollectableEntity,
+  SalesHistoryEntity,
+  PlayerEntity,
+  TradeEntity,
+} from "../generated/schema";
+
+import { zeroBigInt, oneBigInt } from "./helpers";
 
 // Ethereum support
 export function handleAssetUpdated(event: AssetUpdated): void {
   let contract = Contract.bind(event.address);
+  let transaction = event.transaction;
   let collectableDetails = contract.getCollectibleDetails(event.params.tokenId);
   let tokenId = event.params.tokenId;
   let tokenURI = contract.tokenURI(tokenId);
 
   let entity = createCollectableEntity(tokenId, tokenURI, collectableDetails);
+
+  //Create the Player associated with this collectable
+  let mlbPlayerId = entity.mlbPlayerId.toString();
+  let player = createPlayerEntity(mlbPlayerId);
+  player.totalVolume = player.totalVolume.plus(transaction.value);
+
+  player.save();
+  entity.playerEntity = mlbPlayerId;
+
   entity.save();
 }
 
 export function handleCreated(event: Created): void {
   let tokenId = event.params.tokenId;
+  let transaction = event.transaction;
 
   let contract = Contract.bind(event.address);
   let collectableDetails = contract.getCollectibleDetails(tokenId);
@@ -31,20 +49,41 @@ export function handleCreated(event: Created): void {
 
   let entity = createCollectableEntity(tokenId, tokenURI, collectableDetails);
 
+  //Create the Player associated with this collectable
+  let mlbPlayerId = entity.mlbPlayerId.toString();
+  let player = createPlayerEntity(mlbPlayerId);
+  player.totalCollectables = player.totalCollectables.plus(oneBigInt());
+  player.totalVolume = player.totalVolume.plus(transaction.value);
+
+  player.save();
+  entity.playerEntity = mlbPlayerId;
+
   entity.save();
+}
+
+function createPlayerEntity(mlbPlayerId: string): PlayerEntity | null {
+  let player = PlayerEntity.load(mlbPlayerId);
+  if (player === null) {
+    player = new PlayerEntity(mlbPlayerId);
+    player.totalCollectables = zeroBigInt();
+    player.totalVolume = zeroBigInt();
+  }
+
+  return player;
 }
 
 function createCollectableEntity(
   tokenId: BigInt,
   tokenURI: string,
   details: Contract__getCollectibleDetailsResult
-): CollectableEntity {
-  let entity = new CollectableEntity(tokenId.toHex());
+): CollectableEntity | null {
+  let entity = CollectableEntity.load(tokenId.toHex());
+
+  if (entity === null) {
+    entity = new CollectableEntity(tokenId.toHex());
+  }
 
   entity.tokenId = tokenId;
-  entity.isAttached = details.value0;
-  entity.sequenceId = details.value1;
-
   entity.teamId = details.value2;
   let teamName = convertTeamId(entity.teamId);
   entity.teamName = teamName;
@@ -55,9 +94,6 @@ function createCollectableEntity(
 
   entity.creationTime = details.value4;
   entity.attributes = details.value5;
-  entity.playerOverrideId = details.value6;
-  entity.mlbGameId = details.value7;
-  entity.currentGameCardId = details.value8;
   entity.mlbPlayerId = details.value9;
   entity.earnedBy = details.value10;
   entity.generationSeason = details.value11;
@@ -68,6 +104,10 @@ function createCollectableEntity(
 
 export function handleTransfer(event: Transfer): void {
   let transaction = event.transaction;
+  let tokenId = event.params._tokenId;
+  let contract = Contract.bind(event.address);
+
+  let collectableDetails = contract.getCollectibleDetails(tokenId);
 
   let entity = new SalesHistoryEntity(transaction.hash.toHex());
 
@@ -81,8 +121,29 @@ export function handleTransfer(event: Transfer): void {
   entity.timeStamp = event.block.timestamp;
 
   //Create the Entity Relationship
-  entity.collectable = event.params._tokenId.toHex();
+  entity.collectable = tokenId.toString();
   entity.save();
+
+  //Create the Player associated with this collectable
+  let mlbPlayerId = collectableDetails.value9;
+  let player = createPlayerEntity(mlbPlayerId.toString());
+  player.totalVolume = player.totalVolume.plus(transaction.value);
+
+  player.save();
+
+  //Create a trade entry
+  let tradeEntity = TradeEntity.load(tokenId.toString());
+  if (tradeEntity === null) {
+    tradeEntity = new TradeEntity(tokenId.toString());
+    tradeEntity.totalTradesCounter = zeroBigInt();
+    tradeEntity.collectable = tokenId.toHex();
+    tradeEntity.player = mlbPlayerId.toString();
+  }
+  tradeEntity.totalTradesCounter = tradeEntity.totalTradesCounter.plus(
+    oneBigInt()
+  );
+
+  tradeEntity.save();
 }
 
 export function handleApproval(event: Approval): void {}
