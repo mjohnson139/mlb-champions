@@ -17,6 +17,7 @@ type CollectableEntity @entity {
   isAttached: BigInt
   sequenceId: BigInt
   teamId: Int
+  teamName: String
   positionId: Int
   positionName: String
   creationTime: BigInt

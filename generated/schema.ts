@@ -214,6 +214,23 @@ export class CollectableEntity extends Entity {
     this.set("teamId", Value.fromI32(value));
   }
 
+  get teamName(): string | null {
+    let value = this.get("teamName");
+    if (value === null) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set teamName(value: string | null) {
+    if (value === null) {
+      this.unset("teamName");
+    } else {
+      this.set("teamName", Value.fromString(value as string));
+    }
+  }
+
   get positionId(): i32 {
     let value = this.get("positionId");
     return value.toI32();
