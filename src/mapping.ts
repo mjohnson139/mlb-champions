@@ -26,13 +26,16 @@ export function handleCreated(event: Created): void {
 
   let contract = Contract.bind(event.address);
   let collectableDetails = contract.getCollectibleDetails(tokenId);
+  let tokenURI = contract.tokenURI(tokenId);
 
-  let entity = createCollectableEntity(tokenId, collectableDetails);
+  let entity = createCollectableEntity(tokenId, tokenURI, collectableDetails);
+
   entity.save();
 }
 
 function createCollectableEntity(
   tokenId: BigInt,
+  tokenURI: string,
   details: Contract__getCollectibleDetailsResult
 ): CollectableEntity {
   let entity = new CollectableEntity(tokenId.toHex());
@@ -54,6 +57,7 @@ function createCollectableEntity(
   entity.mlbPlayerId = details.value9;
   entity.earnedBy = details.value10;
   entity.generationSeason = details.value11;
+  entity.tokenURI = tokenURI;
 
   return entity;
 }
