@@ -1,0 +1,39 @@
+specVersion: 0.0.2
+schema:
+  file: schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: Contract
+    network: mainnet
+    source:
+      address: "0x8c9b261faef3b3c2e64ab5e58e04615f8c788099"
+      abi: Contract
+      startBlock: 6141663
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - ContractUpgrade
+        - AssetUpdated
+        - Created
+        - Transfer
+        - Approval
+        - ApprovalForAll
+      abis:
+        - name: Contract
+          file: Contract/abis/Contract.json
+      eventHandlers:
+        - event: ContractUpgrade(address)
+          handler: handleContractUpgrade
+        - event: AssetUpdated(uint256)
+          handler: handleAssetUpdated
+        - event: Created(address,uint256)
+          handler: handleCreated
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+        - event: Approval(indexed address,indexed address,indexed uint256)
+          handler: handleApproval
+        - event: ApprovalForAll(indexed address,indexed address,bool)
+          handler: handleApprovalForAll
+      file: Contract/Contract.wasm
