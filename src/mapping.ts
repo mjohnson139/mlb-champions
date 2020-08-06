@@ -28,11 +28,21 @@ import {
 // Ethereum support
 export function handleAssetUpdated(event: AssetUpdated): void {
   let contract = Contract.bind(event.address);
+  let transaction = event.transaction;
   let collectableDetails = contract.getCollectibleDetails(event.params.tokenId);
   let tokenId = event.params.tokenId;
   let tokenURI = contract.tokenURI(tokenId);
 
   let entity = createCollectableEntity(tokenId, tokenURI, collectableDetails);
+
+  //Create the Player associated with this collectable
+  let mlbPlayerId = entity.mlbPlayerId.toString();
+  let player = createPlayerEntity(mlbPlayerId);
+  player.totalVolume = player.totalVolume.plus(transaction.value);
+
+  player.save();
+  entity.playerEntity = mlbPlayerId;
+
   entity.save();
 }
 
@@ -48,20 +58,25 @@ export function handleCreated(event: Created): void {
 
   //Create the Player associated with this collectable
   let mlbPlayerId = entity.mlbPlayerId.toString();
-  let player = PlayerEntity.load(mlbPlayerId);
+  let player = createPlayerEntity(mlbPlayerId);
+  player.totalCollectables = player.totalCollectables.plus(oneBigInt());
+  player.totalVolume = player.totalVolume.plus(transaction.value);
 
-  if (player === null) {
-    player = new PlayerEntity(mlbPlayerId);
-    player.totalCollectables = oneBigInt();
-    player.totalVolume = zeroBigInt().plus(transaction.value);
-  } else {
-    player.totalCollectables = player.totalCollectables.plus(oneBigInt());
-    player.totalVolume = player.totalVolume.plus(transaction.value);
-  }
   player.save();
   entity.playerEntity = mlbPlayerId;
 
   entity.save();
+}
+
+function createPlayerEntity(mlbPlayerId: string): PlayerEntity | null {
+  let player = PlayerEntity.load(mlbPlayerId);
+  if (player === null) {
+    player = new PlayerEntity(mlbPlayerId);
+    player.totalCollectables = oneBigInt();
+    player.totalVolume = zeroBigInt();
+  }
+
+  return player;
 }
 
 function createCollectableEntity(
@@ -96,6 +111,10 @@ function createCollectableEntity(
 
 export function handleTransfer(event: Transfer): void {
   let transaction = event.transaction;
+  let tokenId = event.params._tokenId;
+  let contract = Contract.bind(event.address);
+
+  let collectableDetails = contract.getCollectibleDetails(tokenId);
 
   let entity = new SalesHistoryEntity(transaction.hash.toHex());
 
@@ -108,8 +127,16 @@ export function handleTransfer(event: Transfer): void {
   entity.gasPrice = transaction.gasPrice;
   entity.timeStamp = event.block.timestamp;
 
+  //Create the Player associated with this collectable
+  let mlbPlayerId = collectableDetails.value9;
+  let player = createPlayerEntity(mlbPlayerId.toString());
+  player.totalVolume = player.totalVolume.plus(transaction.value);
+
+  player.save();
+
   //Create the Entity Relationship
   entity.collectable = event.params._tokenId.toHex();
+
   entity.save();
 }
 
