@@ -24,6 +24,7 @@ type CollectableEntity @entity {
   sequenceId: BigInt
   teamId: Int
   positionId: Int
+  positionName: String
   creationTime: BigInt
   attributes: BigInt
   playerOverrideId: BigInt
