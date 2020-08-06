@@ -19,25 +19,6 @@ import {
 import { zeroBigInt, oneBigInt } from "./helpers";
 
 // Ethereum support
-export function handleAssetUpdated(event: AssetUpdated): void {
-  let contract = Contract.bind(event.address);
-  let transaction = event.transaction;
-  let collectableDetails = contract.getCollectibleDetails(event.params.tokenId);
-  let tokenId = event.params.tokenId;
-  let tokenURI = contract.tokenURI(tokenId);
-
-  let entity = createCollectableEntity(tokenId, tokenURI, collectableDetails);
-
-  //Create the Player associated with this collectable
-  let mlbPlayerId = entity.mlbPlayerId.toString();
-  let player = createPlayerEntity(mlbPlayerId);
-  player.totalVolume = player.totalVolume.plus(transaction.value);
-
-  player.save();
-  entity.playerEntity = mlbPlayerId;
-
-  entity.save();
-}
 
 export function handleCreated(event: Created): void {
   let tokenId = event.params.tokenId;
@@ -61,45 +42,24 @@ export function handleCreated(event: Created): void {
   entity.save();
 }
 
-function createPlayerEntity(mlbPlayerId: string): PlayerEntity | null {
-  let player = PlayerEntity.load(mlbPlayerId);
-  if (player === null) {
-    player = new PlayerEntity(mlbPlayerId);
-    player.totalCollectables = zeroBigInt();
-    player.totalVolume = zeroBigInt();
-  }
+export function handleAssetUpdated(event: AssetUpdated): void {
+  let contract = Contract.bind(event.address);
+  let transaction = event.transaction;
+  let collectableDetails = contract.getCollectibleDetails(event.params.tokenId);
+  let tokenId = event.params.tokenId;
+  let tokenURI = contract.tokenURI(tokenId);
 
-  return player;
-}
+  let entity = createCollectableEntity(tokenId, tokenURI, collectableDetails);
 
-function createCollectableEntity(
-  tokenId: BigInt,
-  tokenURI: string,
-  details: Contract__getCollectibleDetailsResult
-): CollectableEntity | null {
-  let entity = CollectableEntity.load(tokenId.toHex());
+  //Create the Player associated with this collectable
+  let mlbPlayerId = entity.mlbPlayerId.toString();
+  let player = createPlayerEntity(mlbPlayerId);
+  player.totalVolume = player.totalVolume.plus(transaction.value);
 
-  if (entity === null) {
-    entity = new CollectableEntity(tokenId.toHex());
-  }
+  player.save();
+  entity.playerEntity = mlbPlayerId;
 
-  entity.tokenId = tokenId;
-  entity.teamId = details.value2;
-  let teamName = convertTeamId(entity.teamId);
-  entity.teamName = teamName;
-
-  entity.positionId = details.value3;
-  let positionName = convertPositionId(entity.positionId);
-  entity.positionName = positionName;
-
-  entity.creationTime = details.value4;
-  entity.attributes = details.value5;
-  entity.mlbPlayerId = details.value9;
-  entity.earnedBy = details.value10;
-  entity.generationSeason = details.value11;
-  entity.tokenURI = tokenURI;
-
-  return entity;
+  entity.save();
 }
 
 export function handleTransfer(event: Transfer): void {
@@ -144,6 +104,47 @@ export function handleTransfer(event: Transfer): void {
   );
 
   tradeEntity.save();
+}
+
+function createPlayerEntity(mlbPlayerId: string): PlayerEntity | null {
+  let player = PlayerEntity.load(mlbPlayerId);
+  if (player === null) {
+    player = new PlayerEntity(mlbPlayerId);
+    player.totalCollectables = zeroBigInt();
+    player.totalVolume = zeroBigInt();
+  }
+
+  return player;
+}
+
+function createCollectableEntity(
+  tokenId: BigInt,
+  tokenURI: string,
+  details: Contract__getCollectibleDetailsResult
+): CollectableEntity | null {
+  let entity = CollectableEntity.load(tokenId.toHex());
+
+  if (entity === null) {
+    entity = new CollectableEntity(tokenId.toHex());
+  }
+
+  entity.tokenId = tokenId;
+  entity.teamId = details.value2;
+  let teamName = convertTeamId(entity.teamId);
+  entity.teamName = teamName;
+
+  entity.positionId = details.value3;
+  let positionName = convertPositionId(entity.positionId);
+  entity.positionName = positionName;
+
+  entity.creationTime = details.value4;
+  entity.attributes = details.value5;
+  entity.mlbPlayerId = details.value9;
+  entity.earnedBy = details.value10;
+  entity.generationSeason = details.value11;
+  entity.tokenURI = tokenURI;
+
+  return entity;
 }
 
 export function handleApproval(event: Approval): void {}
