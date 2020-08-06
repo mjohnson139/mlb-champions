@@ -16,8 +16,9 @@ export function handleAssetUpdated(event: AssetUpdated): void {
   let contract = Contract.bind(event.address);
   let collectableDetails = contract.getCollectibleDetails(event.params.tokenId);
   let tokenId = event.params.tokenId;
+  let tokenURI = contract.tokenURI(tokenId);
 
-  let entity = createCollectableEntity(tokenId, collectableDetails);
+  let entity = createCollectableEntity(tokenId, tokenURI, collectableDetails);
   entity.save();
 }
 
