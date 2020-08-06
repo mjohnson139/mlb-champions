@@ -170,6 +170,15 @@ export class SalesHistoryEntity extends Entity {
   set collectable(value: string) {
     this.set("collectable", Value.fromString(value));
   }
+
+  get timeStamp(): BigInt {
+    let value = this.get("timeStamp");
+    return value.toBigInt();
+  }
+
+  set timeStamp(value: BigInt) {
+    this.set("timeStamp", Value.fromBigInt(value));
+  }
 }
 
 export class CollectableEntity extends Entity {
@@ -413,6 +422,23 @@ export class CollectableEntity extends Entity {
       this.unset("salesHistories");
     } else {
       this.set("salesHistories", Value.fromStringArray(value as Array<string>));
+    }
+  }
+
+  get tokenURI(): string | null {
+    let value = this.get("tokenURI");
+    if (value === null) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set tokenURI(value: string | null) {
+    if (value === null) {
+      this.unset("tokenURI");
+    } else {
+      this.set("tokenURI", Value.fromString(value as string));
     }
   }
 }
